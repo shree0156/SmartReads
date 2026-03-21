@@ -7,6 +7,7 @@
 ![License](https://img.shields.io/badge/License-MIT-lightgrey?style=flat-square)
 
 > **Find your next destined book** — SmartReads combines content-based and collaborative filtering into a single hybrid engine that solves the cold-start problem and surfaces genuinely personalised recommendations.
+![SmartReads App Demo](Screenshot 2025-05-27 003515.png)
 
 ---
 
