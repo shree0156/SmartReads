@@ -133,6 +133,8 @@ http://localhost:8501
 
 > **Note:** The `.pkl` model files must be present in the same directory as `SmartReads.py` for the app to load correctly.
 
+<img width="1175" height="1013" alt="demo" src="https://github.com/user-attachments/assets/e82591de-7f35-4037-845d-4d266c107388" />
+
 ---
 
 ## Key Design Decisions
