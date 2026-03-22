@@ -8,17 +8,8 @@ import gdown
 # --- Download pkl files from Google Drive if not present ---
 # Replace each YOUR_XXXX_ID with your actual Google Drive file ID
 
-if not os.path.exists('filtered_books_df.pkl'):
-    gdown.download('https://drive.google.com/uc?id=YOUR_FILTERED_BOOKS_ID', 'filtered_books_df.pkl', quiet=False)
-
-if not os.path.exists('cosine_sim.pkl'):
-    gdown.download('https://drive.google.com/uc?id=YOUR_COSINE_SIM_ID', 'cosine_sim.pkl', quiet=False)
-
-if not os.path.exists('book_title_indices.pkl'):
-    gdown.download('https://drive.google.com/uc?id=YOUR_INDICES_ID', 'book_title_indices.pkl', quiet=False)
-
 if not os.path.exists('svd_model_data.pkl'):
-    gdown.download('https://drive.google.com/uc?id=YOUR_SVD_MODEL_DATA_ID', 'svd_model_data.pkl', quiet=False)
+    gdown.download('https://drive.google.com/uc?id=1hZACIG9IL09oCegWG4XSpLMAW6Z9DHz4', 'svd_model_data.pkl', quiet=False)
 
 # --- Load all files ---
 filtered_books = joblib.load('filtered_books_df.pkl')
