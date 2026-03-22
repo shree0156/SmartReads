@@ -4,3 +4,4 @@ numpy
 scikit-learn
 joblib
 gdown
+surprise @ git+https://github.com/NicolasHug/Surprise.git
