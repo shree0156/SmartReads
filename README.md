@@ -5,9 +5,10 @@
 ![Scikit-learn](https://img.shields.io/badge/Scikit--learn-TF--IDF-orange?style=flat-square)
 ![Surprise](https://img.shields.io/badge/Surprise-SVD-green?style=flat-square)
 ![License](https://img.shields.io/badge/License-MIT-lightgrey?style=flat-square)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Streamlit-red?style=flat-square&logo=streamlit)](https://shree0156-credit-risk-prediction-model-app-nunrbe.streamlit.app/)
 
 > **Find your next destined book** — SmartReads combines content-based and collaborative filtering into a single hybrid engine that solves the cold-start problem and surfaces genuinely personalised recommendations.
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-Streamlit-red?style=flat-square&logo=streamlit)](https://shree0156-credit-risk-prediction-model-app-nunrbe.streamlit.app/)
+
 ---
 
 ## The Problem
