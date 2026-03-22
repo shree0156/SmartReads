@@ -1,24 +1,48 @@
 import streamlit as st
 import pandas as pd
 import joblib
-import difflib
-import gdown
+import numpy as np
 import os
+import gdown
 
+# --- Download pkl files from Google Drive if not present ---
+# Replace each YOUR_XXXX_ID with your actual Google Drive file ID
 
-# --- Load Data and Models ---
+if not os.path.exists('filtered_books_df.pkl'):
+    gdown.download('https://drive.google.com/uc?id=YOUR_FILTERED_BOOKS_ID', 'filtered_books_df.pkl', quiet=False)
+
+if not os.path.exists('cosine_sim.pkl'):
+    gdown.download('https://drive.google.com/uc?id=YOUR_COSINE_SIM_ID', 'cosine_sim.pkl', quiet=False)
+
+if not os.path.exists('book_title_indices.pkl'):
+    gdown.download('https://drive.google.com/uc?id=YOUR_INDICES_ID', 'book_title_indices.pkl', quiet=False)
+
+if not os.path.exists('svd_model_data.pkl'):
+    gdown.download('https://drive.google.com/uc?id=YOUR_SVD_MODEL_DATA_ID', 'svd_model_data.pkl', quiet=False)
+
+# --- Load all files ---
 filtered_books = joblib.load('filtered_books_df.pkl')
-cosine_sim = joblib.load('cosine_sim.pkl')
-indices = joblib.load('book_title_indices.pkl')
+cosine_sim     = joblib.load('cosine_sim.pkl')
+indices        = joblib.load('book_title_indices.pkl')
+model_data     = joblib.load('svd_model_data.pkl')
 
-#loading svd_model from google drive as the file is large
-if not os.path.exists('svd_model.pkl'):
-    gdown.download(
-        'https://drive.google.com/uc?id=1hZACIG9IL09oCegWG4XSpLMAW6Z9DHz4', #here I have taken only ID that's present between /d/ and /view/
-        'svd_model.pkl',
-        quiet=False
-    )
-svd_model = joblib.load('svd_model.pkl')
+# --- Unpack SVD components ---
+qi           = model_data['qi']
+pu           = model_data['pu']
+bi           = model_data['bi']
+bu           = model_data['bu']
+global_mean  = model_data['global_mean']
+inner_to_raw = model_data['inner_to_raw']
+raw_to_inner = {v: k for k, v in inner_to_raw.items()}
+
+# --- SVD prediction function (no surprise library needed) ---
+def svd_predict(isbn):
+    iid = str(isbn)
+    if iid not in raw_to_inner:
+        return float(global_mean)
+    inner_id = raw_to_inner[iid]
+    pred = global_mean + bi[inner_id] + bu[0] + np.dot(qi[inner_id], pu[0])
+    return float(np.clip(pred, 1, 10))
 
 # --- App Config ---
 st.set_page_config(page_title="SmartReads - Hybrid Book Recommender", layout="wide")
@@ -32,19 +56,15 @@ book_input = st.text_input("Search by book title or author", placeholder="e.g. H
 def hybrid_recommendations(user_input):
     user_input = user_input.lower().strip()
 
-    # Create a lowercase version of the index mapping
     normalized_indices = {k.lower(): v for k, v in indices.items()}
 
-    # Match by title or author
-    title_matches = filtered_books[filtered_books['book_title'].str.lower().str.contains(user_input)]
-    author_matches = filtered_books[filtered_books['book_author'].str.lower().str.contains(user_input)]
+    title_matches  = filtered_books[filtered_books['book_title'].str.lower().str.contains(user_input, na=False)]
+    author_matches = filtered_books[filtered_books['book_author'].str.lower().str.contains(user_input, na=False)]
     combined_matches = pd.concat([title_matches, author_matches]).drop_duplicates()
 
     if combined_matches.empty:
         return None, None
 
-
-    # Take the first matching book for recommendation
     matched_title = combined_matches.iloc[0]['book_title']
     idx = normalized_indices.get(matched_title.lower())
 
@@ -53,47 +73,23 @@ def hybrid_recommendations(user_input):
         return None, None
 
     # Content-Based Filtering
-    sim_scores = list(enumerate(cosine_sim[idx]))
-    sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)[1:11]
+    sim_scores  = sorted(list(enumerate(cosine_sim[idx])), key=lambda x: x[1], reverse=True)[1:11]
     sim_indices = [i[0] for i in sim_scores]
     similar_books = filtered_books.iloc[sim_indices].copy()
 
-    # Collaborative Filtering
-    similar_books["pred_rating"] = similar_books["isbn"].apply(
-        lambda x: svd_model.predict("9999", x).est
-    )
+    # SVD Collaborative Filtering
+    similar_books["pred_rating"] = similar_books["isbn"].apply(svd_predict)
 
-    # Combine hybrid score
+    # Similarity scores
     for i, (_, score) in enumerate(sim_scores):
         similar_books.loc[similar_books.index[i], "sim_score"] = score
 
-    similar_books["final_score"] = 0.5 * similar_books["sim_score"] + 0.5 * similar_books["pred_rating"]
-    hybrid_sorted = similar_books.sort_values("final_score", ascending=False)
-
-    return hybrid_sorted, matched_title
-
-
-    # --- Content-Based Filtering ---
-    sim_scores = list(enumerate(cosine_sim[idx]))
-    sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)[1:11]
-    sim_indices = [i[0] for i in sim_scores]
-    similar_books = filtered_books.iloc[sim_indices].copy()
-
-    # --- Collaborative Filtering (SVD) ---
-    similar_books["pred_rating"] = similar_books["isbn"].apply(
-        lambda x: svd_model.predict("9999", x).est
-    )
-
-    # --- Combine scores ---
-    for i, (_, score) in enumerate(sim_scores):
-        similar_books.loc[similar_books.index[i], "sim_score"] = score
-
+    # Hybrid score
     similar_books["final_score"] = (
-        0.5 * similar_books["sim_score"] + 0.5 * similar_books["pred_rating"]
+        0.5 * similar_books["sim_score"] +
+        0.5 * similar_books["pred_rating"] / 10.0
     )
-    hybrid_sorted = similar_books.sort_values("final_score", ascending=False)
-
-    return hybrid_sorted, matched_title
+    return similar_books.sort_values("final_score", ascending=False), matched_title
 
 
 # --- Display Results ---
@@ -112,6 +108,5 @@ if book_input:
             with col2:
                 st.subheader(row['book_title'])
                 st.caption(f"{row['book_author']} | Genre: {row.get('genre', 'Unknown')}")
-                st.write(f"**{row['pred_rating']:.2f}** |Similarity: **{row['sim_score']:.2f}**")
+                st.write(f"**{row['pred_rating']:.2f}** | Similarity: **{row['sim_score']:.2f}**")
                 st.markdown("---")
-
