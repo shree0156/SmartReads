@@ -1,11 +1,5 @@
 # SmartReads — Hybrid Book Recommendation System
 
-![Python](https://img.shields.io/badge/Python-3.8+-blue?style=flat-square&logo=python)
-![Scikit-learn](https://img.shields.io/badge/Scikit--learn-TF--IDF-orange?style=flat-square)
-![Surprise](https://img.shields.io/badge/Surprise-SVD-green?style=flat-square)
-![License](https://img.shields.io/badge/License-MIT-lightgrey?style=flat-square)
-
-
 > **Find your next destined book** — SmartReads combines content-based and collaborative filtering into a single hybrid engine that solves the cold-start problem and surfaces genuinely personalised recommendations.
 
 ---
