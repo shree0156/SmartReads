@@ -15,7 +15,7 @@ if not os.path.exists('svd_model_data.pkl'):
 filtered_books = joblib.load('filtered_books_df.pkl')
 cosine_sim     = joblib.load('cosine_sim.pkl')
 indices        = joblib.load('book_title_indices.pkl')
-model_data     = joblib.load('svd_model_data.pkl')
+model_data = joblib.load('svd_model_data_v2.pkl')
 
 # --- Unpack SVD components ---
 qi           = model_data['qi']
