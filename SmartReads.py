@@ -2,12 +2,22 @@ import streamlit as st
 import pandas as pd
 import joblib
 import difflib
+import gdown
+import os
 
 
 # --- Load Data and Models ---
 filtered_books = joblib.load('filtered_books_df.pkl')
 cosine_sim = joblib.load('cosine_sim.pkl')
 indices = joblib.load('book_title_indices.pkl')
+
+#loading svd_model from google drive as the file is large
+if not os.path.exists('svd_model.pkl'):
+    gdown.download(
+        'https://drive.google.com/uc?id=1hZACIG9IL09oCegWG4XSpLMAW6Z9DHz4', #here I have taken only ID that's present between /d/ and /view/
+        'svd_model.pkl',
+        quiet=False
+    )
 svd_model = joblib.load('svd_model.pkl')
 
 # --- App Config ---
