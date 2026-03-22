@@ -66,6 +66,7 @@ User Input (title or author)
 | 1 | Murder on the Orient Express | Agatha Christie | 4.35 | 0.96 |
 | 2 | And Then There Were None | Agatha Christie | 4.29 | 0.93 |
 
+**Try it live:** [SmartReads App](https://shree0156-smartreads-smartreads-1xuw9b.streamlit.app/)
 ---
 
 ## Tech Stack
