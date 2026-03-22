@@ -3,7 +3,6 @@ import pandas as pd
 import joblib
 import difflib
 
-from numpy.distutils.misc_util import colour_text
 
 # --- Load Data and Models ---
 filtered_books = joblib.load('filtered_books_df.pkl')
