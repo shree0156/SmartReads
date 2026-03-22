@@ -1,5 +1,5 @@
 # SmartReads — Hybrid Book Recommendation System
-
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Streamlit-red?style=flat-square&logo=streamlit)](https://shree0156-smartreads-smartreads-1xuw9b.streamlit.app/)
 > **Find your next destined book** — SmartReads combines content-based and collaborative filtering into a single hybrid engine that solves the cold-start problem and surfaces genuinely personalised recommendations.
 
 ---
